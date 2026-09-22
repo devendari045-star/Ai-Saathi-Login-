@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>AI Saathi - Login</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -19,15 +20,15 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-family:Arial,sans-serif;
+  font-family:Arial, sans-serif;
   background:linear-gradient(135deg,#071a3d,#123f7a);
 }
 
 .card{
   width:92%;
   max-width:430px;
-  background:#fff;
-  padding:40px 30px;
+  background:#ffffff;
+  padding:42px 30px;
   border-radius:22px;
   text-align:center;
   box-shadow:0 20px 60px rgba(0,0,0,.30);
@@ -46,24 +47,38 @@ h1{
 
 .subtitle{
   color:#666;
-  margin-bottom:28px;
+  margin:10px 0 28px;
+  font-size:15px;
 }
 
 .google-btn{
   width:100%;
-  padding:15px;
-  border:1px solid #ddd;
-  border-radius:11px;
-  background:#fff;
-  color:#333;
+  padding:15px 18px;
+  border:1px solid #dadce0;
+  border-radius:10px;
+  background:#ffffff;
+  color:#3c4043;
   font-size:16px;
-  font-weight:bold;
+  font-weight:600;
   cursor:pointer;
-  box-shadow:0 3px 10px rgba(0,0,0,.08);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  box-shadow:0 2px 7px rgba(0,0,0,.08);
 }
 
 .google-btn:hover{
-  background:#f7f7f7;
+  background:#f8f9fa;
+}
+
+.google-icon{
+  font-size:20px;
+}
+
+.google-btn:disabled{
+  opacity:.65;
+  cursor:not-allowed;
 }
 
 .back{
@@ -77,6 +92,7 @@ h1{
 #message{
   margin-top:18px;
   font-size:14px;
+  min-height:20px;
 }
 </style>
 </head>
@@ -90,14 +106,22 @@ h1{
   <h1>AI Saathi</h1>
 
   <div class="subtitle">
-    Login to continue
+    Sign in to continue
   </div>
 
-  <button class="google-btn" onclick="googleLogin()">
-    🔵 Continue with Google
+  <button
+    id="googleLoginBtn"
+    class="google-btn"
+    onclick="googleLogin()"
+  >
+    <span class="google-icon">🔵</span>
+    <span>Continue with Google</span>
   </button>
 
-  <a class="back" href="https://sites.google.com/view/aisathi/home">
+  <a
+    class="back"
+    href="https://sites.google.com/view/aisathi/home"
+  >
     ← Back to AI Saathi
   </a>
 
@@ -123,28 +147,54 @@ const auth = firebase.auth();
 
 const provider = new firebase.auth.GoogleAuthProvider();
 
+/* Google account chooser */
+provider.setCustomParameters({
+  prompt: "select_account"
+});
+
 function googleLogin(){
 
+  const button = document.getElementById("googleLoginBtn");
   const message = document.getElementById("message");
 
+  button.disabled = true;
+
   message.style.color = "#123f7a";
-  message.innerText = "Opening Google Login...";
+  message.innerText = "Opening Google Sign-In...";
 
   auth.signInWithPopup(provider)
 
-    .then((result) => {
+    .then(function(result){
 
       message.style.color = "green";
       message.innerText = "Login successful!";
 
+      setTimeout(function(){
+
+        window.location.href =
+          "https://sites.google.com/view/aisathi/home";
+
+      },800);
+
     })
 
-    .catch((error) => {
+    .catch(function(error){
 
       console.error(error);
 
+      button.disabled = false;
+
       message.style.color = "red";
-      message.innerText = error.message;
+
+      if(error.code === "auth/popup-closed-by-user"){
+        message.innerText = "Google sign-in was cancelled.";
+      }
+      else if(error.code === "auth/popup-blocked"){
+        message.innerText = "Please allow pop-ups and try again.";
+      }
+      else{
+        message.innerText = error.message;
+      }
 
     });
 }
