@@ -1,215 +1,313 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>AI Saathi - Login</title>
+<title>AI Saathi Login</title>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 
 <style>
+
 *{
   box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
 }
 
 body{
-  margin:0;
   min-height:100vh;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-family:Arial,sans-serif;
-  background:linear-gradient(135deg,#071a3d,#123f7a);
+  color:white;
+
+  background:
+    radial-gradient(circle at 20% 20%,#075cff55,transparent 35%),
+    radial-gradient(circle at 80% 80%,#00d9ff33,transparent 35%),
+    #020617;
 }
 
-.card{
-  width:92%;
-  max-width:430px;
-  background:#ffffff;
-  padding:42px 30px;
-  border-radius:22px;
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+
+  background:
+    linear-gradient(#ffffff08 1px,transparent 1px),
+    linear-gradient(90deg,#ffffff08 1px,transparent 1px);
+
+  background-size:45px 45px;
+
+  pointer-events:none;
+}
+
+.box{
+  width:min(450px,90%);
+
+  padding:40px;
+
   text-align:center;
-  box-shadow:0 20px 60px rgba(0,0,0,.30);
+
+  border:1px solid #ffffff18;
+  border-radius:28px;
+
+  background:#ffffff0b;
+
+  backdrop-filter:blur(20px);
+
+  box-shadow:
+    0 0 50px #008cff25;
 }
 
 .logo{
-  font-size:52px;
-  margin-bottom:8px;
+  font-size:34px;
+  font-weight:800;
 }
 
-h1{
-  margin:5px 0;
-  color:#123f7a;
-  font-size:30px;
+.logo span{
+  color:#29d9ff;
 }
 
 .subtitle{
-  color:#666;
-  margin:10px 0 28px;
-  font-size:15px;
+  margin-top:10px;
+  color:#9caed0;
+  line-height:1.5;
 }
 
-.google-btn{
+button{
   width:100%;
-  padding:15px 18px;
-  border:1px solid #dadce0;
-  border-radius:10px;
-  background:#ffffff;
-  color:#3c4043;
+
+  margin-top:30px;
+
+  padding:15px;
+
+  border:0;
+
+  border-radius:14px;
+
+  color:white;
+
+  background:
+    linear-gradient(90deg,#075cff,#00c6ff);
+
   font-size:16px;
-  font-weight:600;
+
+  font-weight:bold;
+
   cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  box-shadow:0 2px 7px rgba(0,0,0,.08);
+
+  box-shadow:0 0 25px #008cff35;
 }
 
-.google-btn:hover{
-  background:#f8f9fa;
+button:hover{
+  opacity:.9;
+  transform:translateY(-1px);
 }
 
-.google-btn:disabled{
-  opacity:.65;
-  cursor:not-allowed;
-}
+.status{
+  margin-top:20px;
 
-.google-icon{
-  font-size:20px;
-}
+  min-height:22px;
 
-.back{
-  display:block;
-  margin-top:22px;
-  color:#123f7a;
-  text-decoration:none;
+  color:#40dcff;
+
   font-size:14px;
 }
 
-#message{
-  margin-top:18px;
-  font-size:14px;
-  min-height:20px;
-}
 </style>
+
 </head>
 
 <body>
 
-<div class="card">
 
-  <div class="logo">🤖</div>
+<div class="box">
 
-  <h1>AI Saathi</h1>
-
-  <div class="subtitle">
-    Sign in to continue
+  <div class="logo">
+    🤖 AI <span>Saathi</span>
   </div>
 
-  <button
-    id="googleLoginBtn"
-    class="google-btn"
-    onclick="googleLogin()"
-  >
-    <span class="google-icon">🔵</span>
-    <span>Continue with Google</span>
+  <p class="subtitle">
+    Login to AI Saathi and access your personalized AI Rewards Dashboard.
+  </p>
+
+
+  <button id="loginButton" onclick="loginWithGoogle()">
+    🔐 Continue with Google
   </button>
 
-  <a
-    class="back"
-    href="https://sites.google.com/view/aisathi/home"
-  >
-    ← Back to AI Saathi
-  </a>
 
-  <div id="message"></div>
+  <div class="status" id="status"></div>
 
 </div>
 
+
 <script>
 
+
+/* =========================================
+   FIREBASE CONFIG
+========================================= */
+
 const firebaseConfig = {
-  apiKey: "AIzaSyCDmMjTED7rRTz9UcKyJ_MipmTnSMFOdvI",
-  authDomain: "ai-saathi-1b460.firebaseapp.com",
-  projectId: "ai-saathi-1b460",
-  storageBucket: "ai-saathi-1b460.firebasestorage.app",
-  messagingSenderId: "989761556178",
-  appId: "1:989761556178:web:81256fc1e710e3b972270b",
-  measurementId: "G-PB8R9D9N0D"
+
+  apiKey:
+  "AIzaSyCDmMjTED7rRTz9UcKyJ_MipMtnSMFOdvI",
+
+  authDomain:
+  "ai-saathi-1b460.firebaseapp.com",
+
+  projectId:
+  "ai-saathi-1b460",
+
+  storageBucket:
+  "ai-saathi-1b460.firebasestorage.app",
+
+  messagingSenderId:
+  "989761556178",
+
+  appId:
+  "1:989761556178:web:81256fc1e710e3b972270b",
+
+  measurementId:
+  "G-PB8R9D9N0D"
+
 };
+
 
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 
-const provider = new firebase.auth.GoogleAuthProvider();
+const provider =
+new firebase.auth.GoogleAuthProvider();
 
-/* Always show Google's account chooser */
 provider.setCustomParameters({
-  prompt: "select_account"
+  prompt:"select_account"
 });
 
 
-function googleLogin(){
+/* =========================================
+   DASHBOARD URL
+========================================= */
 
-  const button = document.getElementById("googleLoginBtn");
-  const message = document.getElementById("message");
+const DASHBOARD_URL =
+"https://devendari045-star.github.io/Ai-Saathi-Login-/dashboard.html";
+
+
+/* =========================================
+   GOOGLE LOGIN
+========================================= */
+
+async function loginWithGoogle(){
+
+  const button =
+  document.getElementById("loginButton");
+
+  const status =
+  document.getElementById("status");
+
 
   button.disabled = true;
 
-  message.style.color = "#123f7a";
-  message.innerText = "Opening Google Sign-In...";
+  button.innerText =
+  "🔄 Connecting...";
 
-  auth.signInWithPopup(provider)
+  status.innerText =
+  "Please complete Google login.";
 
-    .then(function(result){
 
-      message.style.color = "green";
-      message.innerText = "Login successful!";
+  try{
+
+    const result =
+    await auth.signInWithPopup(provider);
+
+
+    if(result.user){
+
+      status.innerText =
+      "✅ Login successful! Opening Rewards Dashboard...";
+
 
       /*
-        Login successful:
-        Directly open AI Saathi Home page.
+       IMPORTANT:
+       Successful login goes directly
+       to dashboard.html
       */
 
       window.location.replace(
-        "https://sites.google.com/view/aisathi/home"
+        DASHBOARD_URL
       );
 
-    })
+    }
 
-    .catch(function(error){
+  }
 
-      console.error(error);
+  catch(error){
 
-      button.disabled = false;
+    console.error(error);
 
-      message.style.color = "red";
+    button.disabled = false;
 
-      if(error.code === "auth/popup-closed-by-user"){
+    button.innerText =
+    "🔐 Continue with Google";
 
-        message.innerText =
-          "Google sign-in was cancelled.";
 
-      }
-      else if(error.code === "auth/popup-blocked"){
+    if(error.code ===
+       "auth/popup-closed-by-user"){
 
-        message.innerText =
-          "Please allow pop-ups and try again.";
+      status.innerText =
+      "Login cancelled. Please try again.";
 
-      }
-      else{
+    }
 
-        message.innerText =
-          error.message;
+    else if(error.code ===
+            "auth/popup-blocked"){
 
-      }
+      status.innerText =
+      "Popup blocked. Please allow popups for this site.";
 
-    });
+    }
+
+    else{
+
+      status.innerText =
+      "⚠️ Login failed: " +
+      error.message;
+
+    }
+
+  }
+
 }
+
+
+/* =========================================
+   CHECK EXISTING LOGIN
+========================================= */
+
+auth.onAuthStateChanged(function(user){
+
+  if(user){
+
+    /*
+      If already logged in,
+      show dashboard directly.
+    */
+
+    window.location.replace(
+      DASHBOARD_URL
+    );
+
+  }
+
+});
+
 
 </script>
 
