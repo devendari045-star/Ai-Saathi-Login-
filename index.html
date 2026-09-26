@@ -102,11 +102,19 @@ button{
   cursor:pointer;
 
   box-shadow:0 0 25px #008cff35;
+
+  transition:.2s;
 }
 
 button:hover{
   opacity:.9;
   transform:translateY(-1px);
+}
+
+button:disabled{
+  opacity:.65;
+  cursor:not-allowed;
+  transform:none;
 }
 
 .status{
@@ -125,7 +133,6 @@ button:hover{
 
 <body>
 
-
 <div class="box">
 
   <div class="logo">
@@ -136,11 +143,9 @@ button:hover{
     Login to AI Saathi and access your personalized AI Rewards Dashboard.
   </p>
 
-
   <button id="loginButton" onclick="loginWithGoogle()">
     🔐 Continue with Google
   </button>
-
 
   <div class="status" id="status"></div>
 
@@ -149,46 +154,34 @@ button:hover{
 
 <script>
 
-
 /* =========================================
    FIREBASE CONFIG
+   CURRENT CONFIG FROM FIREBASE CONSOLE
 ========================================= */
 
 const firebaseConfig = {
-
-  apiKey:
-  "AIzaSyCDmMjTED7rRTz9UcKyJ_MipMtnSMFOdvI",
-
-  authDomain:
-  "ai-saathi-1b460.firebaseapp.com",
-
-  projectId:
-  "ai-saathi-1b460",
-
-  storageBucket:
-  "ai-saathi-1b460.firebasestorage.app",
-
-  messagingSenderId:
-  "989761556178",
-
-  appId:
-  "1:989761556178:web:81256fc1e710e3b972270b",
-
-  measurementId:
-  "G-PB8R9D9N0D"
-
+  apiKey: "AIzaSyCDmMjTED7rRTz9UcKyJ_MipmTnSMFOdvI",
+  authDomain: "ai-saathi-1b460.firebaseapp.com",
+  projectId: "ai-saathi-1b460",
+  storageBucket: "ai-saathi-1b460.firebasestorage.app",
+  messagingSenderId: "989761556178",
+  appId: "1:989761556178:web:81256fc1e710e3b972270b",
+  measurementId: "G-PB8R9D9N0D"
 };
 
+
+/* =========================================
+   INITIALIZE FIREBASE
+========================================= */
 
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 
-const provider =
-new firebase.auth.GoogleAuthProvider();
+const provider = new firebase.auth.GoogleAuthProvider();
 
 provider.setCustomParameters({
-  prompt:"select_account"
+  prompt: "select_account"
 });
 
 
@@ -207,38 +200,28 @@ const DASHBOARD_URL =
 async function loginWithGoogle(){
 
   const button =
-  document.getElementById("loginButton");
+    document.getElementById("loginButton");
 
   const status =
-  document.getElementById("status");
-
+    document.getElementById("status");
 
   button.disabled = true;
 
   button.innerText =
-  "🔄 Connecting...";
+    "🔄 Connecting...";
 
   status.innerText =
-  "Please complete Google login.";
-
+    "Please complete Google login.";
 
   try{
 
     const result =
-    await auth.signInWithPopup(provider);
+      await auth.signInWithPopup(provider);
 
-
-    if(result.user){
+    if(result && result.user){
 
       status.innerText =
-      "✅ Login successful! Opening Rewards Dashboard...";
-
-
-      /*
-       IMPORTANT:
-       Successful login goes directly
-       to dashboard.html
-      */
+        "✅ Login successful! Opening Rewards Dashboard...";
 
       window.location.replace(
         DASHBOARD_URL
@@ -250,19 +233,22 @@ async function loginWithGoogle(){
 
   catch(error){
 
-    console.error(error);
+    console.error(
+      "Firebase Login Error:",
+      error
+    );
 
     button.disabled = false;
 
     button.innerText =
-    "🔐 Continue with Google";
+      "🔐 Continue with Google";
 
 
     if(error.code ===
        "auth/popup-closed-by-user"){
 
       status.innerText =
-      "Login cancelled. Please try again.";
+        "Login cancelled. Please try again.";
 
     }
 
@@ -270,15 +256,31 @@ async function loginWithGoogle(){
             "auth/popup-blocked"){
 
       status.innerText =
-      "Popup blocked. Please allow popups for this site.";
+        "Popup blocked. Please allow popups for this site.";
+
+    }
+
+    else if(error.code ===
+            "auth/api-key-not-valid"){
+
+      status.innerText =
+        "⚠️ Firebase API key is not valid. Please check the Firebase project configuration.";
+
+    }
+
+    else if(error.code ===
+            "auth/unauthorized-domain"){
+
+      status.innerText =
+        "⚠️ This website domain is not authorized in Firebase.";
 
     }
 
     else{
 
       status.innerText =
-      "⚠️ Login failed: " +
-      error.message;
+        "⚠️ Login failed: " +
+        (error.message || "Unknown Firebase error.");
 
     }
 
@@ -295,11 +297,6 @@ auth.onAuthStateChanged(function(user){
 
   if(user){
 
-    /*
-      If already logged in,
-      show dashboard directly.
-    */
-
     window.location.replace(
       DASHBOARD_URL
     );
@@ -307,7 +304,6 @@ auth.onAuthStateChanged(function(user){
   }
 
 });
-
 
 </script>
 
