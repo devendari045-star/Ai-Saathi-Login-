@@ -143,11 +143,17 @@ button:disabled{
     Login to AI Saathi and access your personalized AI Rewards Dashboard.
   </p>
 
-  <button id="loginButton" onclick="loginWithGoogle()">
+  <button
+    id="loginButton"
+    onclick="loginWithGoogle()"
+  >
     🔐 Continue with Google
   </button>
 
-  <div class="status" id="status"></div>
+  <div
+    class="status"
+    id="status"
+  ></div>
 
 </div>
 
@@ -156,7 +162,7 @@ button:disabled{
 
 /* =========================================
    FIREBASE CONFIG
-   CURRENT CONFIG FROM FIREBASE CONSOLE
+   CURRENT FIREBASE CONSOLE CONFIG
 ========================================= */
 
 const firebaseConfig = {
@@ -178,7 +184,8 @@ firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
 
-const provider = new firebase.auth.GoogleAuthProvider();
+const provider =
+  new firebase.auth.GoogleAuthProvider();
 
 provider.setCustomParameters({
   prompt: "select_account"
@@ -190,7 +197,7 @@ provider.setCustomParameters({
 ========================================= */
 
 const DASHBOARD_URL =
-"https://devendari045-star.github.io/Ai-Saathi-Login-/dashboard.html";
+  "https://devendari045-star.github.io/Ai-Saathi-Login-/dashboard.html";
 
 
 /* =========================================
@@ -205,6 +212,7 @@ async function loginWithGoogle(){
   const status =
     document.getElementById("status");
 
+
   button.disabled = true;
 
   button.innerText =
@@ -213,19 +221,31 @@ async function loginWithGoogle(){
   status.innerText =
     "Please complete Google login.";
 
+
   try{
 
     const result =
       await auth.signInWithPopup(provider);
+
 
     if(result && result.user){
 
       status.innerText =
         "✅ Login successful! Opening Rewards Dashboard...";
 
-      window.location.replace(
-        DASHBOARD_URL
-      );
+
+      /*
+       IMPORTANT:
+       Dashboard redirect happens ONLY
+       after successful Google login.
+      */
+
+      setTimeout(function(){
+
+        window.location.href =
+          DASHBOARD_URL;
+
+      },500);
 
     }
 
@@ -238,41 +258,50 @@ async function loginWithGoogle(){
       error
     );
 
+
     button.disabled = false;
 
     button.innerText =
       "🔐 Continue with Google";
 
 
-    if(error.code ===
-       "auth/popup-closed-by-user"){
+    if(
+      error.code ===
+      "auth/popup-closed-by-user"
+    ){
 
       status.innerText =
         "Login cancelled. Please try again.";
 
     }
 
-    else if(error.code ===
-            "auth/popup-blocked"){
+    else if(
+      error.code ===
+      "auth/popup-blocked"
+    ){
 
       status.innerText =
         "Popup blocked. Please allow popups for this site.";
 
     }
 
-    else if(error.code ===
-            "auth/api-key-not-valid"){
+    else if(
+      error.code ===
+      "auth/unauthorized-domain"
+    ){
 
       status.innerText =
-        "⚠️ Firebase API key is not valid. Please check the Firebase project configuration.";
+        "⚠️ This website is not authorized in Firebase.";
 
     }
 
-    else if(error.code ===
-            "auth/unauthorized-domain"){
+    else if(
+      error.code ===
+      "auth/api-key-not-valid"
+    ){
 
       status.innerText =
-        "⚠️ This website domain is not authorized in Firebase.";
+        "⚠️ Firebase API key is not valid.";
 
     }
 
@@ -280,30 +309,16 @@ async function loginWithGoogle(){
 
       status.innerText =
         "⚠️ Login failed: " +
-        (error.message || "Unknown Firebase error.");
+        (
+          error.message ||
+          "Unknown Firebase error."
+        );
 
     }
 
   }
 
 }
-
-
-/* =========================================
-   CHECK EXISTING LOGIN
-========================================= */
-
-auth.onAuthStateChanged(function(user){
-
-  if(user){
-
-    window.location.replace(
-      DASHBOARD_URL
-    );
-
-  }
-
-});
 
 </script>
 
