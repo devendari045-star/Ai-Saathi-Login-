@@ -1,25 +1,684 @@
-from pathlib import Path
+<!DOCTYPE html>
+<html lang="en">
+<head>
 
-src = Path("/mnt/data/Pasted text(4).txt")
-out = Path("/mnt/data/dashboard_fixed.html")
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-text = src.read_text(encoding="utf-8")
+<title>AI Saathi Rewards</title>
 
-# Use the exact current Firebase Console API key supplied by the user.
-text = text.replace(
-    "AIzaSyCDmMjTED7rRTz9UcKyJ_MipmTnSMFOdvI",
-    "AIzaSyCDmMjTED7rRTz9UcKyJ_MipmTnSMFOdvI"
-)
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-# Replace the auth-check section with a stable auth flow:
-old = """auth.onAuthStateChanged(async function(user){
+<style>
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  min-height:100vh;
+  color:white;
+
+  background:
+    radial-gradient(circle at 15% 20%,#073bff55,transparent 35%),
+    radial-gradient(circle at 85% 80%,#00d9ff33,transparent 35%),
+    #020617;
+
+  overflow-x:hidden;
+}
+
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+
+  background:
+    linear-gradient(#ffffff08 1px,transparent 1px),
+    linear-gradient(90deg,#ffffff08 1px,transparent 1px);
+
+  background-size:45px 45px;
+
+  pointer-events:none;
+}
+
+.container{
+  width:min(1100px,92%);
+  margin:40px auto;
+}
+
+.header{
+  padding:30px;
+
+  border:1px solid #ffffff18;
+  border-radius:25px;
+
+  background:#ffffff0b;
+
+  backdrop-filter:blur(18px);
+
+  box-shadow:0 0 40px #008cff18;
+
+  margin-bottom:22px;
+}
+
+.logo{
+  font-size:30px;
+  font-weight:800;
+}
+
+.logo span{
+  color:#29d9ff;
+}
+
+.subtitle{
+  margin-top:8px;
+  color:#9caed0;
+}
+
+.points{
+  margin-top:25px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.pointsBox{
+  background:
+    linear-gradient(135deg,#075cff,#00bfff);
+
+  padding:20px 28px;
+
+  border-radius:20px;
+
+  box-shadow:0 0 35px #008cff55;
+}
+
+.pointsBox small{
+  display:block;
+  opacity:.8;
+}
+
+.pointsBox strong{
+  font-size:38px;
+}
+
+.grid{
+  display:grid;
+
+  grid-template-columns:
+  repeat(3,1fr);
+
+  gap:18px;
+}
+
+.card{
+  padding:25px;
+
+  border-radius:22px;
+
+  border:1px solid #ffffff15;
+
+  background:#ffffff09;
+
+  backdrop-filter:blur(15px);
+
+  transition:.3s;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+
+  border-color:#20cfff66;
+
+  box-shadow:0 0 30px #00bfff22;
+}
+
+.icon{
+  font-size:35px;
+
+  margin-bottom:15px;
+}
+
+.card h3{
+  margin-bottom:8px;
+}
+
+.card p{
+  color:#9caed0;
+
+  line-height:1.5;
+}
+
+.value{
+  font-size:27px;
+
+  font-weight:bold;
+
+  margin-top:15px;
+
+  color:#40dcff;
+}
+
+button{
+  margin-top:18px;
+
+  width:100%;
+
+  padding:13px;
+
+  border:0;
+
+  border-radius:12px;
+
+  color:white;
+
+  background:
+    linear-gradient(90deg,#075cff,#00c6ff);
+
+  cursor:pointer;
+
+  font-weight:bold;
+}
+
+button:hover{
+  opacity:.85;
+}
+
+.section{
+  margin-top:22px;
+}
+
+.challenge{
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:20px;
+
+  flex-wrap:wrap;
+}
+
+.challenge button{
+  width:auto;
+
+  min-width:170px;
+}
+
+.logout{
+  background:
+    linear-gradient(90deg,#dc2626,#ef4444);
+
+  width:auto;
+
+  padding:10px 18px;
+
+  margin-top:0;
+}
+
+.status{
+  margin-top:15px;
+
+  color:#55e6ff;
+
+  font-size:14px;
+}
+
+.footer{
+  text-align:center;
+
+  color:#687899;
+
+  padding:30px 0;
+}
+
+.loading{
+  position:fixed;
+
+  inset:0;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  background:#020617;
+
+  z-index:9999;
+
+  font-size:20px;
+
+  color:#40dcff;
+
+  text-align:center;
+
+  padding:30px;
+}
+
+.loading a{
+  color:#40dcff;
+  text-decoration:none;
+  font-weight:bold;
+}
+
+@media(max-width:800px){
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="loading" id="loading">
+  🤖 Connecting AI Saathi...
+</div>
+
+
+<div class="container">
+
+  <!-- HEADER -->
+
+  <div class="header">
+
+    <div class="logo">
+      🤖 AI <span>Saathi</span>
+    </div>
+
+    <div class="subtitle">
+      Learn AI • Create AI • Earn Rewards
+    </div>
+
+
+    <div class="points">
+
+      <div>
+
+        <h2>
+          Welcome, <span id="userName">User</span> 👋
+        </h2>
+
+        <p class="subtitle">
+          Your AI Saathi Rewards Dashboard
+        </p>
+
+        <p class="status" id="userEmail">
+          Connecting...
+        </p>
+
+      </div>
+
+
+      <div class="pointsBox">
+
+        <small>
+          YOUR POINTS
+        </small>
+
+        <strong id="points">
+          0
+        </strong>
+
+        ⭐
+
+      </div>
+
+    </div>
+
+
+    <button
+      class="logout"
+      onclick="logout()">
+
+      Logout
+
+    </button>
+
+  </div>
+
+
+  <!-- CARDS -->
+
+  <div class="grid">
+
+
+    <!-- STREAK -->
+
+    <div class="card">
+
+      <div class="icon">
+        🔥
+      </div>
+
+      <h3>
+        Daily Streak
+      </h3>
+
+      <p>
+        Keep visiting AI Saathi and complete daily activities.
+      </p>
+
+      <div class="value">
+
+        <span id="streak">
+          0
+        </span>
+
+        Days
+
+      </div>
+
+    </div>
+
+
+    <!-- CHALLENGE -->
+
+    <div class="card">
+
+      <div class="icon">
+        🎯
+      </div>
+
+      <h3>
+        Daily Challenge
+      </h3>
+
+      <p>
+        Complete today's AI challenge and earn points.
+      </p>
+
+      <div class="value">
+        +100 ⭐
+      </div>
+
+      <button
+        onclick="completeChallenge()">
+
+        Complete Challenge
+
+      </button>
+
+    </div>
+
+
+    <!-- LEVEL -->
+
+    <div class="card">
+
+      <div class="icon">
+        🏆
+      </div>
+
+      <h3>
+        Reward Level
+      </h3>
+
+      <p>
+        Your reward level increases as you earn more points.
+      </p>
+
+      <div
+        class="value"
+        id="level">
+
+        Starter
+
+      </div>
+
+    </div>
+
+
+    <!-- FEEDBACK -->
+
+    <div class="card">
+
+      <div class="icon">
+        📝
+      </div>
+
+      <h3>
+        Feedback
+      </h3>
+
+      <p>
+        Tell us how AI Saathi can become better.
+      </p>
+
+      <button
+        onclick="openFeedback()">
+
+        Give Feedback
+
+      </button>
+
+    </div>
+
+
+    <!-- REVIEW -->
+
+    <div class="card">
+
+      <div class="icon">
+        ⭐
+      </div>
+
+      <h3>
+        Review
+      </h3>
+
+      <p>
+        Share your experience with AI Saathi.
+      </p>
+
+      <button
+        onclick="openReview()">
+
+        Write Review
+
+      </button>
+
+    </div>
+
+
+    <!-- REDEEM -->
+
+    <div class="card">
+
+      <div class="icon">
+        🎁
+      </div>
+
+      <h3>
+        Redeem Rewards
+      </h3>
+
+      <p>
+        Use your points to request available rewards.
+      </p>
+
+      <button
+        onclick="redeem()">
+
+        Redeem Points
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- AI ACTIVITY -->
+
+  <div class="card section challenge">
+
+    <div>
+
+      <h3>
+        🚀 AI Saathi Mission
+      </h3>
+
+      <p>
+        Ask AI something, learn something new and create something useful.
+      </p>
+
+    </div>
+
+
+    <button
+      onclick="startAI()">
+
+      ✦ Start AI Activity
+
+    </button>
+
+  </div>
+
+
+  <div class="footer">
+
+    AI Saathi • Learn • Explore • Grow
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   FIREBASE CONFIG
+===================================================== */
+
+const firebaseConfig = {
+
+  apiKey:
+  "AIzaSyCDmMjTED7rRTz9UcKyJ_MipmTnSMFOdvI",
+
+  authDomain:
+  "ai-saathi-1b460.firebaseapp.com",
+
+  projectId:
+  "ai-saathi-1b460",
+
+  storageBucket:
+  "ai-saathi-1b460.firebasestorage.app",
+
+  messagingSenderId:
+  "989761556178",
+
+  appId:
+  "1:989761556178:web:81256fc1e710e3b972270b",
+
+  measurementId:
+  "G-PB8R9D9N0D"
+
+};
+
+
+/* =====================================================
+   START FIREBASE
+===================================================== */
+
+firebase.initializeApp(firebaseConfig);
+
+const auth =
+firebase.auth();
+
+const db =
+firebase.firestore();
+
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
+let currentUser = null;
+
+let userPoints = 0;
+
+let userStreak = 0;
+
+
+/* =====================================================
+   AUTH PERSISTENCE
+===================================================== */
+
+/*
+   IMPORTANT:
+   Firebase login session ko browser me LOCAL
+   rakhenge, taaki dashboard par session lost
+   na ho.
+*/
+
+auth.setPersistence(
+  firebase.auth.Auth.Persistence.LOCAL
+).catch(function(error){
+
+  console.error(
+    "Auth persistence error:",
+    error
+  );
+
+});
+
+
+/* =====================================================
+   AUTH CHECK
+===================================================== */
+
+/*
+   IMPORTANT FIX:
+
+   Pehle yahan:
+
+   if(!user){
+      window.location.href = login;
+   }
+
+   tha.
+
+   Isse login/dashboard redirect loop create
+   ho sakta tha.
+
+   Ab dashboard user ko automatically login
+   page par redirect nahi karega.
+*/
+
+auth.onAuthStateChanged(async function(user){
 
   if(!user){
 
-    window.location.href =
-    "https://devendari045-star.github.io/Ai-Saathi-Login-/";
+    document.getElementById("loading").innerHTML =
+
+      "⚠️ Login session not found.<br><br>" +
+
+      "<a href=\"https://devendari045-star.github.io/Ai-Saathi-Login-/\">" +
+
+      "← Back to AI Saathi Login" +
+
+      "</a>";
 
     return;
+
   }
 
 
@@ -40,59 +699,70 @@ old = """auth.onAuthStateChanged(async function(user){
   document.getElementById("loading").style.display =
   "none";
 
-});"""
+});
 
-new = """let authResolved = false;
 
-auth.onAuthStateChanged(async function(user){
+/* =====================================================
+   LOAD USER DATA
+===================================================== */
 
-  if(authResolved){
-    return;
-  }
-
-  authResolved = true;
-
-  if(!user){
-
-    document.getElementById("loading").innerHTML =
-      "⚠️ Login session not found.<br><br>" +
-      "<a href='https://devendari045-star.github.io/Ai-Saathi-Login-/' " +
-      "style='color:#40dcff;text-decoration:none;font-weight:bold'>" +
-      "← Back to AI Saathi Login</a>";
-
-    return;
-  }
-
-  currentUser = user;
-
-  document.getElementById("userName").innerText =
-    user.displayName || "AI Saathi User";
-
-  document.getElementById("userEmail").innerText =
-    user.email || "";
-
-  await loadUserData();
-
-  document.getElementById("loading").style.display =
-    "none";
-
-});"""
-
-if old not in text:
-    raise ValueError("Expected auth-check block was not found.")
-
-text = text.replace(old, new)
-
-# Make logout return to login cleanly without creating a redirect race.
-old_logout = """async function logout(){
+async function loadUserData(){
 
   try{
 
-    await auth.signOut();
+    const userRef =
+    db.collection("users").doc(currentUser.uid);
 
 
-    window.location.href =
-    "https://devendari045-star.github.io/Ai-Saathi-Login-/";
+    const snapshot =
+    await userRef.get();
+
+
+    if(snapshot.exists){
+
+      const data =
+      snapshot.data();
+
+
+      userPoints =
+      Number(data.points || 0);
+
+
+      userStreak =
+      Number(data.streak || 0);
+
+    }
+
+    else{
+
+      await userRef.set({
+
+        name:
+        currentUser.displayName || "AI Saathi User",
+
+        email:
+        currentUser.email || "",
+
+        points:
+        0,
+
+        streak:
+        0,
+
+        createdAt:
+        firebase.firestore.FieldValue.serverTimestamp()
+
+      });
+
+
+      userPoints = 0;
+
+      userStreak = 0;
+
+    }
+
+
+    updateDashboard();
 
   }
 
@@ -100,15 +770,361 @@ old_logout = """async function logout(){
 
     console.error(error);
 
+
+    document.getElementById("loading").innerHTML =
+
+    "⚠️ Firebase connection error.<br><br>" +
+
+    "Please check Firestore rules and try again.";
+
   }
 
-}"""
+}
 
-new_logout = """async function logout(){
+
+/* =====================================================
+   UPDATE DASHBOARD
+===================================================== */
+
+function updateDashboard(){
+
+  document.getElementById("points").innerText =
+  userPoints;
+
+
+  document.getElementById("streak").innerText =
+  userStreak;
+
+
+  let level =
+  "Starter";
+
+
+  if(userPoints >= 1000)
+    level = "Explorer";
+
+
+  if(userPoints >= 2500)
+    level = "Creator";
+
+
+  if(userPoints >= 5000)
+    level = "AI Master";
+
+
+  document.getElementById("level").innerText =
+  level;
+
+}
+
+
+/* =====================================================
+   DAILY CHALLENGE
+===================================================== */
+
+async function completeChallenge(){
+
+  if(!currentUser)
+    return;
+
+
+  try{
+
+    const userRef =
+    db.collection("users").doc(currentUser.uid);
+
+
+    userPoints += 100;
+
+    userStreak += 1;
+
+
+    await userRef.set({
+
+      points:
+      userPoints,
+
+      streak:
+      userStreak
+
+    },{
+
+      merge:true
+
+    });
+
+
+    updateDashboard();
+
+
+    alert(
+      "🎉 Challenge completed!\n\n" +
+      "+100 AI Saathi Points ⭐"
+    );
+
+  }
+
+  catch(error){
+
+    console.error(error);
+
+    alert(
+      "⚠️ Points update nahi ho paya.\n\n" +
+      "Firestore rules check karni hongi."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   FEEDBACK
+===================================================== */
+
+async function openFeedback(){
+
+  if(!currentUser)
+    return;
+
+
+  const message =
+  prompt(
+    "📝 AI Saathi Feedback\n\n" +
+    "Apna feedback likhiye:"
+  );
+
+
+  if(!message)
+    return;
+
+
+  try{
+
+    await db.collection("feedback").add({
+
+      userId:
+      currentUser.uid,
+
+      name:
+      currentUser.displayName || "",
+
+      email:
+      currentUser.email || "",
+
+      message:
+      message,
+
+      createdAt:
+      firebase.firestore.FieldValue.serverTimestamp()
+
+    });
+
+
+    alert(
+      "✅ Feedback submitted successfully!"
+    );
+
+  }
+
+  catch(error){
+
+    console.error(error);
+
+    alert(
+      "⚠️ Feedback submit nahi hua."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   REVIEW
+===================================================== */
+
+async function openReview(){
+
+  if(!currentUser)
+    return;
+
+
+  const review =
+  prompt(
+    "⭐ AI Saathi Review\n\n" +
+    "Apna review likhiye:"
+  );
+
+
+  if(!review)
+    return;
+
+
+  try{
+
+    await db.collection("reviews").add({
+
+      userId:
+      currentUser.uid,
+
+      name:
+      currentUser.displayName || "",
+
+      email:
+      currentUser.email || "",
+
+      rating:
+      5,
+
+      review:
+      review,
+
+      createdAt:
+      firebase.firestore.FieldValue.serverTimestamp()
+
+    });
+
+
+    alert(
+      "⭐ Thank you! Review submitted."
+    );
+
+  }
+
+  catch(error){
+
+    console.error(error);
+
+    alert(
+      "⚠️ Review submit nahi hua."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   REDEEM
+===================================================== */
+
+async function redeem(){
+
+  if(userPoints < 1000){
+
+    alert(
+
+      "🎁 Redeem Rewards\n\n" +
+
+      "Minimum 1,000 points required.\n\n" +
+
+      "Your points: " +
+      userPoints
+
+    );
+
+    return;
+
+  }
+
+
+  const confirmRedeem =
+  confirm(
+
+    "🎁 Redeem Request\n\n" +
+
+    "1000 points = ₹10 reward\n\n" +
+
+    "Redeem request create karein?"
+
+  );
+
+
+  if(!confirmRedeem)
+    return;
+
+
+  try{
+
+    await db.collection("redemptions").add({
+
+      userId:
+      currentUser.uid,
+
+      name:
+      currentUser.displayName || "",
+
+      email:
+      currentUser.email || "",
+
+      points:
+      1000,
+
+      reward:
+      "₹10",
+
+      status:
+      "pending",
+
+      createdAt:
+      firebase.firestore.FieldValue.serverTimestamp()
+
+    });
+
+
+    alert(
+
+      "🎉 Redeem request created!\n\n" +
+
+      "Reward: ₹10\n" +
+
+      "Status: Pending"
+
+    );
+
+  }
+
+  catch(error){
+
+    console.error(error);
+
+    alert(
+      "⚠️ Redeem request create nahi hua."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   START AI
+===================================================== */
+
+function startAI(){
+
+  window.open(
+
+    "https://cdn.botpress.cloud/webchat/v5.0/shareable.html?configUrl=https://files.bpcontent.cloud/2026/09/20/12/20260920122328-US3KDECT.json",
+
+    "_blank"
+
+  );
+
+}
+
+
+/* =====================================================
+   LOGOUT
+===================================================== */
+
+async function logout(){
 
   try{
 
     await auth.signOut();
+
 
     window.location.replace(
       "https://devendari045-star.github.io/Ai-Saathi-Login-/"
@@ -120,19 +1136,15 @@ new_logout = """async function logout(){
 
     console.error(error);
 
-    alert("⚠️ Logout failed. Please try again.");
+    alert(
+      "⚠️ Logout failed. Please try again."
+    );
 
   }
 
-}"""
+}
 
-if old_logout not in text:
-    raise ValueError("Expected logout block was not found.")
+</script>
 
-text = text.replace(old_logout, new_logout)
-
-out.write_text(text, encoding="utf-8")
-
-print(f"Created fixed dashboard file: {out}")
-print("Preserved the original dashboard design and features.")
-print("Updated the authentication flow to avoid the login/dashboard redirect loop.")
+</body>
+</html>
