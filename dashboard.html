@@ -7,7 +7,6 @@
 
 <title>AI Saathi Rewards</title>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
@@ -24,12 +23,10 @@
 body{
   min-height:100vh;
   color:white;
-
   background:
     radial-gradient(circle at 15% 20%,#073bff55,transparent 35%),
     radial-gradient(circle at 85% 80%,#00d9ff33,transparent 35%),
     #020617;
-
   overflow-x:hidden;
 }
 
@@ -37,13 +34,10 @@ body:before{
   content:"";
   position:fixed;
   inset:0;
-
   background:
     linear-gradient(#ffffff08 1px,transparent 1px),
     linear-gradient(90deg,#ffffff08 1px,transparent 1px);
-
   background-size:45px 45px;
-
   pointer-events:none;
 }
 
@@ -54,16 +48,11 @@ body:before{
 
 .header{
   padding:30px;
-
   border:1px solid #ffffff18;
   border-radius:25px;
-
   background:#ffffff0b;
-
   backdrop-filter:blur(18px);
-
   box-shadow:0 0 40px #008cff18;
-
   margin-bottom:22px;
 }
 
@@ -83,23 +72,17 @@ body:before{
 
 .points{
   margin-top:25px;
-
   display:flex;
   align-items:center;
   justify-content:space-between;
-
   gap:20px;
   flex-wrap:wrap;
 }
 
 .pointsBox{
-  background:
-    linear-gradient(135deg,#075cff,#00bfff);
-
+  background:linear-gradient(135deg,#075cff,#00bfff);
   padding:20px 28px;
-
   border-radius:20px;
-
   box-shadow:0 0 35px #008cff55;
 }
 
@@ -114,38 +97,27 @@ body:before{
 
 .grid{
   display:grid;
-
-  grid-template-columns:
-  repeat(3,1fr);
-
+  grid-template-columns:repeat(3,1fr);
   gap:18px;
 }
 
 .card{
   padding:25px;
-
   border-radius:22px;
-
   border:1px solid #ffffff15;
-
   background:#ffffff09;
-
   backdrop-filter:blur(15px);
-
   transition:.3s;
 }
 
 .card:hover{
   transform:translateY(-5px);
-
   border-color:#20cfff66;
-
   box-shadow:0 0 30px #00bfff22;
 }
 
 .icon{
   font-size:35px;
-
   margin-bottom:15px;
 }
 
@@ -155,38 +127,25 @@ body:before{
 
 .card p{
   color:#9caed0;
-
   line-height:1.5;
 }
 
 .value{
   font-size:27px;
-
   font-weight:bold;
-
   margin-top:15px;
-
   color:#40dcff;
 }
 
 button{
   margin-top:18px;
-
   width:100%;
-
   padding:13px;
-
   border:0;
-
   border-radius:12px;
-
   color:white;
-
-  background:
-    linear-gradient(90deg,#075cff,#00c6ff);
-
+  background:linear-gradient(90deg,#075cff,#00c6ff);
   cursor:pointer;
-
   font-weight:bold;
 }
 
@@ -200,77 +159,51 @@ button:hover{
 
 .challenge{
   display:flex;
-
   align-items:center;
-
   justify-content:space-between;
-
   gap:20px;
-
   flex-wrap:wrap;
 }
 
 .challenge button{
   width:auto;
-
   min-width:170px;
 }
 
 .logout{
-  background:
-    linear-gradient(90deg,#dc2626,#ef4444);
-
+  background:linear-gradient(90deg,#dc2626,#ef4444);
   width:auto;
-
   padding:10px 18px;
-
   margin-top:0;
 }
 
 .status{
   margin-top:15px;
-
   color:#55e6ff;
-
   font-size:14px;
 }
 
 .footer{
   text-align:center;
-
   color:#687899;
-
   padding:30px 0;
 }
 
 .loading{
   position:fixed;
-
   inset:0;
-
   display:flex;
-
   align-items:center;
-
   justify-content:center;
-
   background:#020617;
-
   z-index:9999;
-
   font-size:20px;
-
   color:#40dcff;
-
-  text-align:center;
-
-  padding:30px;
 }
 
 .loading a{
   color:#40dcff;
   text-decoration:none;
-  font-weight:bold;
 }
 
 @media(max-width:800px){
@@ -285,17 +218,13 @@ button:hover{
 
 </head>
 
-
 <body>
 
 <div class="loading" id="loading">
   🤖 Connecting AI Saathi...
 </div>
 
-
 <div class="container">
-
-  <!-- HEADER -->
 
   <div class="header">
 
@@ -306,7 +235,6 @@ button:hover{
     <div class="subtitle">
       Learn AI • Create AI • Earn Rewards
     </div>
-
 
     <div class="points">
 
@@ -326,7 +254,6 @@ button:hover{
 
       </div>
 
-
       <div class="pointsBox">
 
         <small>
@@ -343,7 +270,6 @@ button:hover{
 
     </div>
 
-
     <button
       class="logout"
       onclick="logout()">
@@ -355,12 +281,7 @@ button:hover{
   </div>
 
 
-  <!-- CARDS -->
-
   <div class="grid">
-
-
-    <!-- STREAK -->
 
     <div class="card">
 
@@ -388,8 +309,6 @@ button:hover{
 
     </div>
 
-
-    <!-- CHALLENGE -->
 
     <div class="card">
 
@@ -419,8 +338,6 @@ button:hover{
     </div>
 
 
-    <!-- LEVEL -->
-
     <div class="card">
 
       <div class="icon">
@@ -446,8 +363,6 @@ button:hover{
     </div>
 
 
-    <!-- FEEDBACK -->
-
     <div class="card">
 
       <div class="icon">
@@ -472,8 +387,6 @@ button:hover{
     </div>
 
 
-    <!-- REVIEW -->
-
     <div class="card">
 
       <div class="icon">
@@ -497,8 +410,6 @@ button:hover{
 
     </div>
 
-
-    <!-- REDEEM -->
 
     <div class="card">
 
@@ -526,8 +437,6 @@ button:hover{
   </div>
 
 
-  <!-- AI ACTIVITY -->
-
   <div class="card section challenge">
 
     <div>
@@ -541,7 +450,6 @@ button:hover{
       </p>
 
     </div>
-
 
     <button
       onclick="startAI()">
@@ -600,11 +508,13 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-const auth =
-firebase.auth();
+const auth = firebase.auth();
 
-const db =
-firebase.firestore();
+const db = firebase.firestore();
+
+auth.setPersistence(
+  firebase.auth.Auth.Persistence.LOCAL
+);
 
 
 /* =====================================================
@@ -617,64 +527,27 @@ let userPoints = 0;
 
 let userStreak = 0;
 
-
-/* =====================================================
-   AUTH PERSISTENCE
-===================================================== */
-
-/*
-   IMPORTANT:
-   Firebase login session ko browser me LOCAL
-   rakhenge, taaki dashboard par session lost
-   na ho.
-*/
-
-auth.setPersistence(
-  firebase.auth.Auth.Persistence.LOCAL
-).catch(function(error){
-
-  console.error(
-    "Auth persistence error:",
-    error
-  );
-
-});
+let authResolved = false;
 
 
 /* =====================================================
    AUTH CHECK
 ===================================================== */
 
-/*
-   IMPORTANT FIX:
-
-   Pehle yahan:
-
-   if(!user){
-      window.location.href = login;
-   }
-
-   tha.
-
-   Isse login/dashboard redirect loop create
-   ho sakta tha.
-
-   Ab dashboard user ko automatically login
-   page par redirect nahi karega.
-*/
-
 auth.onAuthStateChanged(async function(user){
+
+  if(authResolved){
+    return;
+  }
+
+  authResolved = true;
 
   if(!user){
 
     document.getElementById("loading").innerHTML =
-
       "⚠️ Login session not found.<br><br>" +
-
       "<a href=\"https://devendari045-star.github.io/Ai-Saathi-Login-/\">" +
-
       "← Back to AI Saathi Login" +
-
       "</a>";
 
     return;
@@ -772,10 +645,8 @@ async function loadUserData(){
 
 
     document.getElementById("loading").innerHTML =
-
     "⚠️ Firebase connection error.<br><br>" +
-
-    "Please check Firestore rules and try again.";
+    "Please check Firestore rules.";
 
   }
 
@@ -848,9 +719,7 @@ async function completeChallenge(){
       userStreak
 
     },{
-
       merge:true
-
     });
 
 
@@ -1016,9 +885,7 @@ async function redeem(){
     alert(
 
       "🎁 Redeem Rewards\n\n" +
-
       "Minimum 1,000 points required.\n\n" +
-
       "Your points: " +
       userPoints
 
@@ -1033,9 +900,7 @@ async function redeem(){
   confirm(
 
     "🎁 Redeem Request\n\n" +
-
     "1000 points = ₹10 reward\n\n" +
-
     "Redeem request create karein?"
 
   );
@@ -1076,9 +941,7 @@ async function redeem(){
     alert(
 
       "🎉 Redeem request created!\n\n" +
-
       "Reward: ₹10\n" +
-
       "Status: Pending"
 
     );
@@ -1124,7 +987,6 @@ async function logout(){
   try{
 
     await auth.signOut();
-
 
     window.location.replace(
       "https://devendari045-star.github.io/Ai-Saathi-Login-/"
